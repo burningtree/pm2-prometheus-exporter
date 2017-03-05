@@ -1,0 +1,27 @@
+{
+  "name": "pm2-prometheus-exporter",
+  "version": "0.1.0",
+  "description": "PM2 metric exporter for Prometheus",
+  "main": "exporter.js",
+  "dependencies": {
+    "pm2": "^2.4.2",
+    "prom-client": "^7.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tgmproject/pm2-prometheus-exporter.git"
+  },
+  "config": {
+    "conf_var_1": true,
+    "conf_var_2": "myvalue"
+  },
+  "apps": [
+    {
+      "merge_logs": true,
+      "max_memory_restart": "200M",
+      "script": "exporter.js"
+    }
+  ],
+  "author": "Jan Stránský <jan.stransky@arnal.cz>",
+  "license": "BSD"
+}
