@@ -58,7 +58,14 @@ function metrics () {
 
 function exporter () {
   const server = http.createServer((req, res) => {
-    metrics().then((data) => res.end(data))
+    switch (req.url) {
+      case '/':
+        return res.end('<html>PM2 metrics: <a href="/metrics">/metrics</a></html>')
+      case '/metrics':
+        return metrics().then((data) => res.end(data))
+      default:
+        return res.end('404')
+    }
   })
 
   const port = Number(argv[1]) || 9209
