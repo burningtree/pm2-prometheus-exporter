@@ -1,6 +1,6 @@
 {
   "name": "pm2-prometheus-exporter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "PM2 metric exporter for Prometheus",
   "main": "exporter.js",
   "dependencies": {
