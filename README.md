@@ -1,5 +1,7 @@
 # pm2-prometheus-exporter
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/politinn/pm2-prometheus-exporter.svg)](https://greenkeeper.io/)
+
 ## Installation
 
 ```shell
