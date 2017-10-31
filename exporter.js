@@ -12,7 +12,9 @@ const map = [
   [ 'uptime', 'Process uptime' ],
   [ 'instances', 'Process instances' ],
   [ 'restarts', 'Process restarts' ],
-  [ 'loop_delay', 'V8 loop delay' ]
+  [ 'unstable_restarts', 'Process unstable restarts' ],
+  [ 'loop_delay', 'V8 loop delay' ],
+  [ 'cwd', 'Process current working directory' ]
 ]
 
 function pm2c (cmd, args = []) {
@@ -44,8 +46,10 @@ function metrics () {
         memory: p.monit.memory,
         uptime: Math.round((Date.now() - p.pm2_env.pm_uptime) / 1000),
         instances: p.pm2_env.instances || 1,
-        restarts: p.pm2_env.unstable_restarts,
-        loop_delay: loopDelay ? parseFloat(loopDelay.match(/^[\d.]+/)[0]) : null
+        restarts: p.pm2_env.restart_time,
+        unstable_restarts: p.pm2_env.unstable_restarts,
+        loop_delay: loopDelay ? parseFloat(loopDelay.match(/^[\d.]+/)[0]) : null,
+        cwd: p.pm2_env.pm_cwd
       }
       Object.keys(values).forEach((k) => {
         if (values[k] === null) return null
