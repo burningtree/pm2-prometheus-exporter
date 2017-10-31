@@ -44,7 +44,8 @@ function metrics () {
         memory: p.monit.memory,
         uptime: Math.round((Date.now() - p.pm2_env.pm_uptime) / 1000),
         instances: p.pm2_env.instances || 1,
-        restarts: p.pm2_env.unstable_restarts,
+        restarts: p.pm2_env.restart_time,
+        unstable_restarts: p.pm2_env.unstable_restarts,
         loop_delay: loopDelay ? parseFloat(loopDelay.match(/^[\d.]+/)[0]) : null
       }
       Object.keys(values).forEach((k) => {
