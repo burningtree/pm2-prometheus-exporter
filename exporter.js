@@ -12,6 +12,7 @@ const map = [
   [ 'uptime', 'Process uptime' ],
   [ 'instances', 'Process instances' ],
   [ 'restarts', 'Process restarts' ],
+  [ 'unstabled_restarts', 'Process unstable restarts' ],
   [ 'loop_delay', 'V8 loop delay' ]
 ]
 
