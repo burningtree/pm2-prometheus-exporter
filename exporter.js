@@ -4,18 +4,17 @@ const pm2 = require('pm2')
 const argv = process.argv
 
 const prefix = 'pm2'
-const labels = [ 'name', 'instance' ]
+const labels = ['name', 'instance']
 const map = [
-  [ 'up', 'Is the process running' ],
-  [ 'cpu', 'Process cpu usage' ],
-  [ 'memory', 'Process memory usage' ],
-  [ 'uptime', 'Process uptime' ],
-  [ 'instances', 'Process instances' ],
-  [ 'restarts', 'Process restarts' ],
-  [ 'loop_delay', 'V8 loop delay' ]
+  ['up', 'Is the process running'],
+  ['cpu', 'Process cpu usage'],
+  ['memory', 'Process memory usage'],
+  ['uptime', 'Process uptime'],
+  ['instances', 'Process instances'],
+  ['restarts', 'Process restarts'],
 ]
 
-function pm2c (cmd, args = []) {
+function pm2c(cmd, args = []) {
   return new Promise((resolve, reject) => {
     pm2[cmd](args, (err, resp) => {
       if (err) return reject(err)
@@ -24,7 +23,7 @@ function pm2c (cmd, args = []) {
   })
 }
 
-function metrics () {
+function metrics() {
   let pm = {}
   prom.register.clear()
   map.forEach((m) => {
@@ -32,31 +31,61 @@ function metrics () {
   })
   return pm2c('list').then((list) => {
     list.forEach((p) => {
+
       let conf = {
         name: p.name,
         instance: p.pm2_env.NODE_APP_INSTANCE
-      }
-      let loopDelay = p.pm2_env.axm_monitor['Loop delay']
-        ? p.pm2_env.axm_monitor['Loop delay'].value : false
+      }     
+
       let values = {
         up: p.pm2_env.status === 'online' ? 1 : 0,
         cpu: p.monit.cpu,
         memory: p.monit.memory,
         uptime: Math.round((Date.now() - p.pm2_env.pm_uptime) / 1000),
         instances: p.pm2_env.instances || 1,
-        restarts: p.pm2_env.unstable_restarts,
-        loop_delay: loopDelay ? parseFloat(loopDelay.match(/^[\d.]+/)[0]) : null
+        restarts: p.pm2_env.restart_time,        
       }
+
+      var names = Object.keys(p.pm2_env.axm_monitor)
+
+      for (let index = 0; index < names.length; index++) {
+        const name = names[index];        
+
+        try {
+          let value
+          if (name === 'Loop delay') {
+            value = parseFloat(p.pm2_env.axm_monitor[name].value.match(/^[\d.]+/)[0])
+          }
+          else {
+            value = p.pm2_env.axm_monitor[name].value
+          }         
+
+          var metricName = prefix + '_' + name.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
+         
+          if (!pm[metricName]) {
+            pm[metricName] = new prom.Gauge(metricName, name, labels)
+          }
+
+          values[metricName] = value
+        } catch (error) {
+          console.log(error)
+        }
+
+      }
+
       Object.keys(values).forEach((k) => {
-        if (values[k] === null) return null
+        if (values[k] === null) return null      
+
         pm[k].set(conf, values[k])
       })
+
     })
+
     return prom.register.metrics()
   })
 }
 
-function exporter () {
+function exporter() {
   const server = http.createServer((req, res) => {
     switch (req.url) {
       case '/':

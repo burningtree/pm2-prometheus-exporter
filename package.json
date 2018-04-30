@@ -5,6 +5,7 @@
   "main": "exporter.js",
   "dependencies": {
     "pm2": "^2.4.2",
+    "pmx": "^1.6.4",
     "prom-client": "^7.1.0"
   },
   "repository": {
